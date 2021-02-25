@@ -33,6 +33,7 @@ import me.zhengjie.modules.security.security.TokenProvider;
 import me.zhengjie.modules.security.service.dto.AuthUserDto;
 import me.zhengjie.modules.security.service.dto.JwtUserDto;
 import me.zhengjie.modules.security.service.OnlineUserService;
+import me.zhengjie.modules.system.domain.User;
 import me.zhengjie.utils.RsaUtils;
 import me.zhengjie.utils.RedisUtils;
 import me.zhengjie.utils.SecurityUtils;
@@ -106,6 +107,16 @@ public class AuthorizationController {
         }
         return ResponseEntity.ok(authInfo);
     }
+    @ApiOperation("用户注册")
+    @AnonymousPostMapping(value = "/register")
+    public ResponseEntity<Object> register(@Validated @RequestBody User resources) throws Exception {
+        if (resources.getPassword() == null) {
+            throw new BadRequestException("密码不能为空");
+        }
+        resources.setPassword(passwordEncoder.encode("123456"));
+        userService.create(resources);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
 
     @ApiOperation("获取用户信息")
     @GetMapping(value = "/info")
@@ -113,9 +124,24 @@ public class AuthorizationController {
         return ResponseEntity.ok(SecurityUtils.getCurrentUser());
     }
 
-    @ApiOperation("获取验证码")
+    @ApiOperation("获取字符验证码")
+    @AnonymousGetMapping(value = "/string_code")
+    public ResponseEntity<Object> getStringCode() {
+        // 获取运算的结果
+        Captcha captcha = loginProperties.getCaptcha();
+        String uuid = properties.getCodeKey() + IdUtil.simpleUUID();
+        // 保存
+        redisUtils.set(uuid, captcha.text(), loginProperties.getLoginCode().getExpiration(), TimeUnit.MINUTES);
+        // 验证码信息
+        Map<String, Object> imgResult = new HashMap<String, Object>(2) {{
+            put("img", captcha.toBase64());
+            put("uuid", uuid);
+        }};
+        return ResponseEntity.ok(imgResult);
+    }
+    @ApiOperation("获取图片验证码")
     @AnonymousGetMapping(value = "/code")
-    public ResponseEntity<Object> getCode() {
+    public ResponseEntity<Object> getImageCode() {
         // 获取运算的结果
         Captcha captcha = loginProperties.getCaptcha();
         String uuid = properties.getCodeKey() + IdUtil.simpleUUID();

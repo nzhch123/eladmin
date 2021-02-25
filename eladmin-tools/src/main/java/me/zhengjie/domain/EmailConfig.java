@@ -52,7 +52,7 @@ public class EmailConfig implements Serializable {
     @ApiModelProperty(value = "密码")
     private String pass;
 
-    @NotBlank
+    //@NotBlank
     @ApiModelProperty(value = "收件人")
     private String fromUser;
 }
