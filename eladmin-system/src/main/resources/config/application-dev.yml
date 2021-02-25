@@ -4,9 +4,9 @@ spring:
     druid:
       db-type: com.alibaba.druid.pool.DruidDataSource
       driverClassName: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-      url: jdbc:log4jdbc:mysql://localhost:3306/eladimin?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false
-      username: root
-      password: 6442790
+      url: jdbc:log4jdbc:mysql://8.210.244.147:3306/eladmin?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false
+      username: eladmin
+      password: PY66WmbpzKSPrYe7
       # 初始连接数
       initial-size: 5
       # 最小连接数
@@ -106,8 +106,8 @@ file:
     path: /home/eladmin/file/
     avatar: /home/eladmin/avatar/
   windows:
-    path: C:\eladmin\file\
-    avatar: C:\eladmin\avatar\
+    path: F:\eladmin\file\
+    avatar: F:\eladmin\avatar\
   # 文件大小 /M
   maxSize: 100
   avatarMaxSize: 5
