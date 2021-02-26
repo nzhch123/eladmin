@@ -30,7 +30,7 @@ public class ElAdminConstant {
     /**
      * win 系统
      */
-    public static final String WIN = "win";
+    public static  String WIN = "win";
 
     /**
      * mac 系统

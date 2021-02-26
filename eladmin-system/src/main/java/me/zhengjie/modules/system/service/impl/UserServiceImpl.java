@@ -30,10 +30,12 @@ import me.zhengjie.modules.system.service.dto.UserDto;
 import me.zhengjie.modules.system.service.dto.UserQueryCriteria;
 import me.zhengjie.modules.system.service.mapstruct.UserMapper;
 import me.zhengjie.utils.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -60,6 +62,7 @@ public class UserServiceImpl implements UserService {
     private final RedisUtils redisUtils;
     private final UserCacheClean userCacheClean;
     private final OnlineUserService onlineUserService;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public Object queryAll(UserQueryCriteria criteria, Pageable pageable) {
@@ -132,10 +135,16 @@ public class UserServiceImpl implements UserService {
         user.setPhone(resources.getPhone());
         user.setNickName(resources.getNickName());
         user.setGender(resources.getGender());
+        user.setTrialTime(resources.getTrialTime());
+        if(user.getPassword()!=null){
+            user.setPassword(passwordEncoder.encode(resources.getPassword()));
+        }
         userRepository.save(user);
         // 清除缓存
         delCaches(user.getId(), user.getUsername());
     }
+
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -222,6 +231,7 @@ public class UserServiceImpl implements UserService {
             map.put("手机号码", userDTO.getPhone());
             map.put("修改密码的时间", userDTO.getPwdResetTime());
             map.put("创建日期", userDTO.getCreateTime());
+            map.put("到期日期",userDTO.getTrialTime());
             list.add(map);
         }
         FileUtil.downloadExcel(list, response);
